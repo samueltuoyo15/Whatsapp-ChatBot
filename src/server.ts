@@ -1,12 +1,17 @@
 import express, {Application, Request, Response} from "express"
 import cors from "cors"
 import bodyParser from "body-parser"
+import axios from "axios"
+import { GoogleGenerativeAI } from "@google/generative-ai"
 import dotenv from "dotenv"
 dotenv.config()
 
 const server: Application = express()
 server.use(cors())
 server.use(bodyParser.json())
+
+const genAI = new GoogleGenerativeAI(API_KEY || 'null');
+const textModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
 export const generate = async (prompt: string): Promise<string> => {
 
@@ -71,5 +76,9 @@ server.post("/webhook", async (req: Request, res: Response) => {
   }
   res.sendStatus(200)
 })
+
+const sendMessage = (to: string, from: string) => {
+  const response = axios.post("")
+}
 
 server.listen(Number(process.env.PORT || 3000), () => console.log("Server has started running at " + process.env.PORT))
