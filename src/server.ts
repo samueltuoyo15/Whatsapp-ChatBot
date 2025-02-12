@@ -9,11 +9,11 @@ server.use(cors())
 server.use(bodyParser.json())
 
 server.get("/webhook", (req: Request, res: Response) => {
-  const [mode] = req.query["hub.mode"] as string 
-  const [token] = req.query["hub.verify_token"] as string 
-  const [challenge] = req.query["hub.challenge"] as string 
+  const mode = req.query["hub.mode"] as string 
+  const token = req.query["hub.verify_token"] as string 
+  const challenge = req.query["hub.challenge"] as string 
   
-  if(mode === "subcscribe" && token === process.env.VERIFY_TOKEN){
+  if(mode === "subscribe" && token === process.env.VERIFY_TOKEN){
     console.log("WebHook Verified")
     res.status(200).send(challenge)
   }else{
@@ -26,4 +26,4 @@ server.post("/webhook", (req: Request, res: Response) => {
   res.sendStatus(200)
 })
 
-server.listen(process.env.PORT, () => console.log("Server has started running at " + process.env.PORT))
+server.listen(Number(process.env.PORT || 3000), () => console.log("Server has started running at " + process.env.PORT))
