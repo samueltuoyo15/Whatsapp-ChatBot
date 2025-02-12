@@ -10,35 +10,25 @@ const server: Application = express()
 server.use(cors())
 server.use(bodyParser.json())
 
-const genAI = new GoogleGenerativeAI(API_KEY || 'null');
+const genAI = new GoogleGenerativeAI(process.env.API_KEY || 'null');
 const textModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
 export const generate = async (prompt: string): Promise<string> => {
 
   if (!prompt) {
-    return res.status(400).json({ message: "Invalid or missing prompt" })
+    return "Invalid or missing prompt"
   }
 
-  const systemInstructions = `
-    Act like a whatsap WhatsApp ai agent. u are a ChatBot agent for Nexis Botix an ai tech powered driven startup specializing in creating chatbots, ai agents e.tc. 
-  `
-  const userPrompt = `
-    ${systemInstructions}
-
-    User: ${prompt}
-    Bot:
-  `
+  const systemInstructions = `Act like a whatsap WhatsApp ai agent. u are a ChatBot agent for Nexis Botix an ai tech powered driven startup specializing in creating chatbots, ai agents e.tc. `
+  const userPrompt = `${systemInstructions}\n\nUser: ${prompt}\nBot: `
 
   try {
     const result = await textModel.generateContent(userPrompt)
-     const response: string | undefined = result.response.text()
+     const response: string | undefined = result.response.text() || "sorry i didn't get that"
     return response 
   } catch (error: any) {
     console.error("Error generating content:", error)
-    res.status(500).json({
-      message: "Internal server error",
-      error: error instanceof Error ? error.message : "Unknown error",
-    })
+    return "error generating content"
   }
 }
 
@@ -77,8 +67,24 @@ server.post("/webhook", async (req: Request, res: Response) => {
   res.sendStatus(200)
 })
 
-const sendMessage = (to: string, from: string) => {
-  const response = axios.post("")
+const sendMessage = async (to: string, text: string) => {
+  try{
+       await axios.post(`https://graph.facebook.com/v18.0/${process.env.WHATSAPP_PHONE_ID}/messages`,
+       {
+         messaging_product: "whatsapp",
+         to,
+         text: {body: text},
+       },
+       {
+         headers: {
+           Authorization: `Bearer ${process.env.WHATSAPP_TOKEN}`,
+           "Content-Type": "application/json",
+         },
+       }
+       )
+  } catch(error){
+    console.log(error)
+  }
 }
 
 server.listen(Number(process.env.PORT || 3000), () => console.log("Server has started running at " + process.env.PORT))
