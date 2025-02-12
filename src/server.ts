@@ -10,7 +10,7 @@ const server: Application = express()
 server.use(cors())
 server.use(bodyParser.json())
 
-const genAI = new GoogleGenerativeAI(process.env.API_KEY || 'null');
+const genAI = new GoogleGenerativeAI(process.env.API_KEY || "");
 const textModel = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 
 export const generate = async (prompt: string): Promise<string> => {
@@ -47,9 +47,13 @@ server.get("/webhook", (req: Request, res: Response) => {
 
 server.post("/webhook", async (req: Request, res: Response) => {
   const body = req.body
-  if(!body) return res.status(400).send({message: "Empty Body"})
+  if(!body) {
+    res.status(400).send({message: "Empty Body"})
+    return 
+  }
   
-  if(body.object === "whatsapp_business_account"){
+  try{
+    if(body.object === "whatsapp_business_account"){
     const entry = body.entry?.[0]
     const changes = entry.changes?.[0]
     const message = changes?.value?.messages?.[0]
@@ -62,9 +66,13 @@ server.post("/webhook", async (req: Request, res: Response) => {
       
       const aiResponse = await generate(text)
       await sendMessage(from, aiResponse)
-    }
+    }}
+    res.sendStatus(200)
+  }catch(error: any){
+    console.error(error)
+    res.status(500).send({message: "an error occurred "})
+    return 
   }
-  res.sendStatus(200)
 })
 
 const sendMessage = async (to: string, text: string) => {
@@ -82,6 +90,7 @@ const sendMessage = async (to: string, text: string) => {
          },
        }
        )
+     console.log(`Sent message to ${to}: ${text}`);
   } catch(error){
     console.log(error)
   }
