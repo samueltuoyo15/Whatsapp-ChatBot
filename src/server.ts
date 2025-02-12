@@ -8,6 +8,9 @@ const server: Application = express()
 server.use(cors())
 server.use(bodyParser.json())
 
+const generateResponse = () => {
+  
+}
 server.get("/webhook", (req: Request, res: Response) => {
   const mode = req.query["hub.mode"] as string 
   const token = req.query["hub.verify_token"] as string 
