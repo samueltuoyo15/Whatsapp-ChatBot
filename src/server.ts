@@ -19,7 +19,7 @@ export const generate = async (prompt: string): Promise<string> => {
     return "Invalid or missing prompt"
   }
 
-  const systemInstructions = `Act like a whatsap WhatsApp ai agent. u are a ChatBot agent for Nexis Botix an ai tech powered driven startup specializing in creating chatbots, ai agents e.tc. `
+  const systemInstructions = `Act like a whatsap WhatsApp ai agent. u are a ChatBot agent for Nexus Botix an ai tech powered driven startup specializing in creating chatbots, ai agents e.tc. `
   const userPrompt = `${systemInstructions}\n\nUser: ${prompt}\nBot: `
 
   try {
