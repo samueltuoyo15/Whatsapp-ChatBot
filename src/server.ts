@@ -64,14 +64,14 @@ server.post("/webhook", async (req: Request, res: Response): Promise<any> => {
     return res.sendStatus(200)
   } catch (error) {
     console.error(error)
-    res.status(500).send({ message: "an error occurred" })
+    return res.status(500).send({ message: "an error occurred" })
   }
 })
 
 const sendMessage = async (to: string, text: string) => {
   try {
     await axios.post(
-      `https://graph.facebook.com/v21.0/${process.env.WHATSAPP_PHONE_ID}/messages`,
+      `https://graph.facebook.com/v18.0/${process.env.WHATSAPP_PHONE_ID}/messages`,
       {
         messaging_product: "whatsapp",
         to,
